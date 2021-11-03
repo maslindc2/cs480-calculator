@@ -332,7 +332,7 @@ function calculator(button) {
             symbol = button.symbol + "(";;
             formula = button.formula + "(";
             data.operation.push(symbol);
-            data.operation.push(formula);
+            data.formula.push(formula);
         }
     }else if(button.type == "key"){
         if(button.name == "clear"){
@@ -359,6 +359,7 @@ function calculator(button) {
             let replacement = "Math.pow(" + base + ",";
             formulaStr = formulaStr.replace(toReplace, replacement);
         })
+        
         let result;
         try{
             result = eval(formulaStr);
@@ -377,6 +378,7 @@ function calculator(button) {
     }
     updateOutputOperation(data.operation.join(''));
 }
+
 function search(array, keyword){
     let search_result = [];
     array.forEach((element, index) => {
@@ -384,12 +386,15 @@ function search(array, keyword){
     })
     return search_result;
 }
+//Update the output box with the current operation
 function updateOutputOperation(operation){
     outputElement.innerHTML = operation
 }
+//Update the result after calculation
 function updateOutputResult(result) {
     resultElement.innerHTML = result
 }
+
 function powerBaseGetter(formula, powerSearchResult) {
    let powerBases = []; 
    powerSearchResult.forEach(powerIndex => {
@@ -411,4 +416,46 @@ function powerBaseGetter(formula, powerSearchResult) {
        powerBases.push(base.join('' ) );
    })
    return powerBases;
+}
+
+function trig(callback, angle){
+    //If in degrees mode convert the angle into radians for correct calculation
+    
+    if(!RADIAN){
+        angle = angle * Math.PI/180
+    }
+    
+    //Send to eval in calculator function
+    return callback(angle);
+}
+
+function invTrig(callback, value){
+    let angle= callback(value);
+    if(!RADIAN){
+        angle = angle * 180/Math.PI;
+    }
+    return angle;
+}
+
+/**These functions hanle cotangent and arccotangent.
+ * Since the built in Math object does not support ctg or actg, I had to make my own
+ */
+function cotangent(angle) {
+    if(!RADIAN){
+        angle = angle * (Math.PI/180)
+    }
+    return 1/Math.tan(angle);
+}
+function arccotangent(angle){
+    if(!RADIAN){
+        angle = angle * (Math.PI/180)
+    }
+    //Selects the correct calculation of arccotangent depending on the angle size
+    if (angle > 1) {
+        return Math.atan(1/angle);
+    }else if(angle < -1){
+        return Math.PI + Math.atan(1/angle);
+    }else{
+        return Math.PI - Math.atan(angle);
+    }    
 }
