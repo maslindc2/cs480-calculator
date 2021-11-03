@@ -302,3 +302,113 @@ inputElement.addEventListener("click", event => {
         if(button.name == targetButton.id) calculator(button);
     })
 })
+
+function calculator(button) {
+    if(button.type == "operator"){
+        data.operation.push(button.symbol);
+        data.formula.push(button.formula);
+    }else if(button.type == "number"){
+        data.operation.push(button.symbol);
+        data.formula.push(button.formula);
+    }else if(button.type == "trigFunction"){
+        data.operation.push(button.symbol + "(");
+        data.formula.push(button.formula);
+    }else if(button.type == "mathFunction"){
+        let symbol, formula;
+        if (button.name == "power") {
+            symbol = "^(";
+            formula = button.formula;
+            data.operation.push(symbol);
+            data.formula.push(formula);
+            
+        }else if(button.name == "square"){
+            symbol = "^(";
+            formula = button.formula;
+            data.operation.push(symbol);
+            data.formula.push(formula);
+            data.operation.push("2)");
+            data.formula.push("2)");
+        }else{
+            symbol = button.symbol + "(";;
+            formula = button.formula + "(";
+            data.operation.push(symbol);
+            data.operation.push(formula);
+        }
+    }else if(button.type == "key"){
+        if(button.name == "clear"){
+            data.operation = [];
+            data.formula = [];
+            updateOutputResult(0);
+        }else if(button.name == "delete"){
+            data.operation.pop();
+            data.formula.pop();
+        }else if(button.name == "radians"){
+            RADIAN = true;
+            angleToggle();
+        }else if(button.name == "degrees"){
+            RADIAN = false;
+            angleToggle();
+        }
+    }else if (button.type == "calculate") {
+        formulaStr = data.formula.join('');
+        let powerSearchResult = search(data.formula, POWER);
+        
+        const bases = powerBaseGetter(data.formula, powerSearchResult);
+        bases.forEach( base => {
+            let toReplace = base + POWER;
+            let replacement = "Math.pow(" + base + ",";
+            formulaStr = formulaStr.replace(toReplace, replacement);
+        })
+        let result;
+        try{
+            result = eval(formulaStr);
+        }catch(error){
+            if(error instanceof SyntaxError){
+                result = "Syntax Error!"
+                updateOutputResult(result);
+                return;
+            }
+        }
+        ans = result
+        data.operation = [result];
+        data.formula = [result];
+        updateOutputResult(result);
+        return;
+    }
+    updateOutputOperation(data.operation.join(''));
+}
+function search(array, keyword){
+    let search_result = [];
+    array.forEach((element, index) => {
+        if(element == keyword) search_result.push(index);
+    })
+    return search_result;
+}
+function updateOutputOperation(operation){
+    outputElement.innerHTML = operation
+}
+function updateOutputResult(result) {
+    resultElement.innerHTML = result
+}
+function powerBaseGetter(formula, powerSearchResult) {
+   let powerBases = []; 
+   powerSearchResult.forEach(powerIndex => {
+       let base = [];
+       let parenthesisCount = 0;
+       let previousIndex = powerIndex - 1;
+       while(previousIndex >= 0){
+           if(formula[previousIndex] == "(") parenthesisCount--;
+           if(formula[previousIndex] == ")") parenthesisCount++;
+           let isOperator = false;
+           operators.forEach(operator => {
+               if(formula[previousIndex] == operator) isOperator = true;
+           })
+           let isPower = formula[previousIndex] == POWER;
+           if((isOperator && parenthesisCount == 0) || isPower) break;
+           base.unshift(formula[previousIndex]);
+           previousIndex--;
+       }
+       powerBases.push(base.join('' ) );
+   })
+   return powerBases;
+}
