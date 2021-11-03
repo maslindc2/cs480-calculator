@@ -15,14 +15,14 @@ let ans = 0;
 
 let calculatorButtons = [
     {
-        name : "rad",
-        symbol : "Rad",
+        name : "radians",
+        symbol : "RAD",
         formula : false,
         type : "key"
     },
     {
-        name : "deg",
-        symbol : "Deg",
+        name : "degrees",
+        symbol : "DEG",
         formula : false,
         type : "key"
     },
@@ -281,3 +281,24 @@ function createButtons(){
     })
 }
 createButtons();
+
+//Sets default mode to radians
+let RADIAN = true;
+const radiansButton = document.getElementById("radians")
+const degreesButton = document.getElementById("degrees")
+
+//Sets the active mode to RAD button
+radiansButton.classList.add("activeAngle");
+function angleToggle(){
+    radiansButton.classList.toggle("activeAngle");
+    degreesButton.classList.toggle("activeAngle");
+}
+
+//Listens for click events on all of buttons inside calculator
+//Checks to see what clicked button matches calculatorButtons
+inputElement.addEventListener("click", event => {
+    const targetButton = event.target;
+    calculatorButtons.forEach(button => {
+        if(button.name == targetButton.id) calculator(button);
+    })
+})
