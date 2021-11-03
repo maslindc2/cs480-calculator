@@ -6,13 +6,10 @@ const POWER = "POWER(";
 
 //Stack where operation is displayed on the front end
 //Formula is what is used on the backend to solve what the user inputs
-let data = {
-    operation: [],
-    formula: []
-}
+let data = {operation: [], formula: []}
+let answer = 0;
 
-let ans = 0;
-
+//Used for storing all the buttons (symbol, operation and formula) for each button
 let calculatorButtons = [
     {
         name : "radians",
@@ -268,6 +265,7 @@ let calculatorButtons = [
     },
 ];
 
+//Creates all the buttons using calculatorButtons array
 function createButtons(){
     const buttonsPerRow = 7;
     let addedButtons = 0;
@@ -303,132 +301,16 @@ inputElement.addEventListener("click", event => {
     })
 })
 
-function calculator(button) {
-    if(button.type == "operator"){
-        data.operation.push(button.symbol);
-        data.formula.push(button.formula);
-    }else if(button.type == "number"){
-        data.operation.push(button.symbol);
-        data.formula.push(button.formula);
-    }else if(button.type == "trigFunction"){
-        data.operation.push(button.symbol + "(");
-        data.formula.push(button.formula);
-    }else if(button.type == "mathFunction"){
-        let symbol, formula;
-        if (button.name == "power") {
-            symbol = "^(";
-            formula = button.formula;
-            data.operation.push(symbol);
-            data.formula.push(formula);
-            
-        }else if(button.name == "square"){
-            symbol = "^(";
-            formula = button.formula;
-            data.operation.push(symbol);
-            data.formula.push(formula);
-            data.operation.push("2)");
-            data.formula.push("2)");
-        }else{
-            symbol = button.symbol + "(";;
-            formula = button.formula + "(";
-            data.operation.push(symbol);
-            data.formula.push(formula);
-        }
-    }else if(button.type == "key"){
-        if(button.name == "clear"){
-            data.operation = [];
-            data.formula = [];
-            updateOutputResult(0);
-        }else if(button.name == "delete"){
-            data.operation.pop();
-            data.formula.pop();
-        }else if(button.name == "radians"){
-            RADIAN = true;
-            angleToggle();
-        }else if(button.name == "degrees"){
-            RADIAN = false;
-            angleToggle();
-        }
-    }else if (button.type == "calculate") {
-        formulaStr = data.formula.join('');
-        let powerSearchResult = search(data.formula, POWER);
-        
-        const bases = powerBaseGetter(data.formula, powerSearchResult);
-        bases.forEach( base => {
-            let toReplace = base + POWER;
-            let replacement = "Math.pow(" + base + ",";
-            formulaStr = formulaStr.replace(toReplace, replacement);
-        })
-        
-        let result;
-        try{
-            result = eval(formulaStr);
-        }catch(error){
-            if(error instanceof SyntaxError){
-                result = "Syntax Error!"
-                updateOutputResult(result);
-                return;
-            }
-        }
-        ans = result
-        data.operation = [result];
-        data.formula = [result];
-        updateOutputResult(result);
-        return;
-    }
-    updateOutputOperation(data.operation.join(''));
-}
-
-function search(array, keyword){
-    let search_result = [];
-    array.forEach((element, index) => {
-        if(element == keyword) search_result.push(index);
-    })
-    return search_result;
-}
-//Update the output box with the current operation
-function updateOutputOperation(operation){
-    outputElement.innerHTML = operation
-}
-//Update the result after calculation
-function updateOutputResult(result) {
-    resultElement.innerHTML = result
-}
-
-function powerBaseGetter(formula, powerSearchResult) {
-   let powerBases = []; 
-   powerSearchResult.forEach(powerIndex => {
-       let base = [];
-       let parenthesisCount = 0;
-       let previousIndex = powerIndex - 1;
-       while(previousIndex >= 0){
-           if(formula[previousIndex] == "(") parenthesisCount--;
-           if(formula[previousIndex] == ")") parenthesisCount++;
-           let isOperator = false;
-           operators.forEach(operator => {
-               if(formula[previousIndex] == operator) isOperator = true;
-           })
-           let isPower = formula[previousIndex] == POWER;
-           if((isOperator && parenthesisCount == 0) || isPower) break;
-           base.unshift(formula[previousIndex]);
-           previousIndex--;
-       }
-       powerBases.push(base.join('' ) );
-   })
-   return powerBases;
-}
-
+//Handles trignometric operations from degrees to radians when degree mode is set
 function trig(callback, angle){
     //If in degrees mode convert the angle into radians for correct calculation
-    
     if(!RADIAN){
         angle = angle * Math.PI/180
     }
-    
     //Send to eval in calculator function
     return callback(angle);
 }
-
+//Handles converting of inverse trignometric operations from degrees to radians when degree mode is set
 function invTrig(callback, value){
     let angle= callback(value);
     if(!RADIAN){
@@ -458,4 +340,141 @@ function arccotangent(angle){
     }else{
         return Math.PI - Math.atan(angle);
     }    
+}
+// Calculator function handles all functionality of the buttons
+function calculator(button) {
+
+    //If the button is an operator push the operator to formula and operation
+    if(button.type == "operator"){
+        data.operation.push(button.symbol);
+        data.formula.push(button.formula);
+    //If button is a number push number to formula and operation
+    }else if(button.type == "number"){
+        data.operation.push(button.symbol);
+        data.formula.push(button.formula);
+    //If button is a trig operation push to formula and oepration with open paren
+    }else if(button.type == "trigFunction"){
+        data.operation.push(button.symbol + "(");
+        data.formula.push(button.formula);
+    
+    //If the button is a math function 
+    }else if(button.type == "mathFunction"){
+        let symbol, formula;
+        //If power add ^( sign to operation add the formula from calculatorButtons to formula stack
+        if (button.name == "power") {
+            symbol = "^(";
+            formula = button.formula;
+            data.operation.push(symbol);
+            data.formula.push(formula);
+        //Square add ^( sign as well as to the power of 2
+        }else if(button.name == "square"){
+            symbol = "^(";
+            formula = button.formula;
+            data.operation.push(symbol);
+            data.formula.push(formula);
+            data.operation.push("2)");
+            data.formula.push("2)");
+        }else{
+            symbol = button.symbol + "(";;
+            formula = button.formula + "(";
+            data.operation.push(symbol);
+            data.formula.push(formula);
+        }
+    //If the button is a key
+    }else if(button.type == "key"){
+        //If its clear both stacks and set the result to 0 (resets it to how the page loads initially)
+        if(button.name == "clear"){
+            data.operation = [];
+            data.formula = [];
+            updateOutputResult(0);
+        //When delete button is pressed pop the symbol from both formula and operation
+        }else if(button.name == "delete"){
+            data.operation.pop();
+            data.formula.pop();
+        //If Radians is pushed call angleToggle to switch the mode
+        }else if(button.name == "radians"){
+            RADIAN = true;
+            angleToggle();
+        //If degrees is pushed set RAIDAN to false and switch the mode
+        }else if(button.name == "degrees"){
+            RADIAN = false;
+            angleToggle();
+        }
+    //If calculate is pushed
+    }else if (button.type == "calculate") {
+        formulaStr = data.formula.join('');
+        //Searches for exponents
+        let powerResult = search(data.formula, POWER);
+        //Searches for bases of exponents
+        const bases = powerBaseFinder(data.formula, powerResult);
+        bases.forEach( base => {
+            let toReplace = base + POWER;
+            let replacement = "Math.pow(" + base + ",";
+            formulaStr = formulaStr.replace(toReplace, replacement);
+        })
+        
+        //Attempt to calculate the result
+        let result;
+        try{
+            result = eval(formulaStr);
+        }catch(error){
+            if(error instanceof SyntaxError){
+                result = "Syntax Error!"
+                updateOutputResult(result);
+                return;
+            }
+        }
+        //Set ans
+        answer = result
+        data.operation = [result];
+        data.formula = [result];
+        updateOutputResult(result);
+        return;
+    }
+    updateOutputOperation(data.operation.join(''));
+}
+//Update the output box with the current operation
+function updateOutputOperation(operation){
+    outputElement.innerHTML = operation
+}
+//Update the result after calculation
+function updateOutputResult(result) {
+    resultElement.innerHTML = result
+}
+
+//Looks for powers inside the formula array, keyword is the power to search for.  
+//Once a match has been found adds the index to search_result array and continues then returns the array at the end.
+function search(array, keyword){
+    let search_result = [];
+    array.forEach((element, index) => {
+        if(element == keyword) search_result.push(index);
+    })
+    return search_result;
+}
+
+//Gets the bases of all powers in the formula, append them to base.  Returns 
+function powerBaseFinder(formula, powerSearchResult) {
+    let powerBases = []; 
+    powerSearchResult.forEach(powerIndex => {
+        let base = [];
+        let parenthesisCount = 0;
+        let previousIndex = powerIndex - 1;
+        //Loop over the formula and find the bases inside the formula stack
+        while(previousIndex >= 0){
+            if(formula[previousIndex] == "(") parenthesisCount--;
+            if(formula[previousIndex] == ")") parenthesisCount++;
+            let isOperator = false;
+            operators.forEach(operator => {
+                if(formula[previousIndex] == operator) isOperator = true;
+            })
+            let isPower = formula[previousIndex] == POWER;
+            //If the next item is an operator and we have the whole base break from the while loop
+            if((isOperator && parenthesisCount == 0) || isPower) break;
+            //Moves the current previousIndex to the front of the base array
+            base.unshift(formula[previousIndex]);
+            previousIndex--;
+        }
+        powerBases.push(base.join('' ));
+    })
+    return powerBases;
 }
