@@ -67,3 +67,18 @@ html{
     border: 1px solid #1d1d1d;
     height: 457px;
 }
+.row {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+.row button{
+    width: 60px;
+    height: 60px;
+    font-size: 20px;
+    border: none;
+    border-radius: 50%;
+    background-color: #aaaaaa80;
+    margin : 8px;
+    cursor: pointer;
+}
