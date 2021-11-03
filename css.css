@@ -82,6 +82,44 @@ html{
     margin : 8px;
     cursor: pointer;
 }
+
+.row button:hover{
+    background-color: #7a7a7a80;
+
+}
+
+.row #calculate{
+    color: #FFF;
+    background-color: #2f7aac;
+    border-radius: 50px;
+}
+#calculate:hover{
+    background-color: #285f85;
+}
+.row #clear{
+    color: #FFF;
+    background-color: #e05046;
+}
+#clear:hover{
+    background-color: #af372f;
+}
+
+.row #delete{
+    color: #FFF;
+    background-color: #e05046;
+}
+#delete:hover{
+    background-color: #af372f;
+}
+#division, #multiplication, #subtraction, #addition {
+    color: #2f7aac;
+}
+
+.input button span{
+    font-size: 0.6em;
+    position: absolute;
+}
+
 .activeAngle{
     background-color: #1d1d1d !important;
     color: #FFF !important;
