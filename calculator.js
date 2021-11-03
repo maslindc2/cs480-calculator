@@ -43,13 +43,13 @@ let calculatorButtons = [
     },
     {
         name : "clear",
-        symbol : "C",
+        symbol : "Clear",
         formula : false,
         type : "key"
     },
     {
         name : "delete",
-        symbol : "⌫",
+        symbol : "Del",
         formula : false,
         type : "key"
     },
