@@ -82,3 +82,7 @@ html{
     margin : 8px;
     cursor: pointer;
 }
+.activeAngle{
+    background-color: #1d1d1d !important;
+    color: #FFF !important;
+}
